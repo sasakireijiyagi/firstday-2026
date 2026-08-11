@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>糸島夏休み明けプロジェクト2026</title>
 
+  <!-- OGP / SNS シェア用 -->
+  <meta property="og:title" content="糸島夏休み明けプロジェクト2026">
+  <meta property="og:description" content="夏休み明け初日、糸島に子どもの居場所をたくさん開けます。8月27日（木）。">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Hina+Mincho&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
@@ -13,23 +19,81 @@
     :root{
       --bg: #E9F7FF;
       --ink: #2F4668;
+      --muted: #4B6282;
       --accent: #5C8EDC;
+      --card: #FFFFFF;
+      --shadow: 0 10px 28px rgba(17,24,39,.08), 0 2px 6px rgba(17,24,39,.06);
+      --max-w: 820px;
+      --radius: 12px;
     }
     body{
       margin:0; font-family:'Noto Sans JP', sans-serif;
-      background:var(--bg); color:var(--ink);
-      min-height:100vh; display:flex; align-items:center; justify-content:center;
+      color:var(--muted); background:var(--bg);
       -webkit-font-smoothing:antialiased;
     }
-    h1{
+    .container{max-width:var(--max-w); margin:auto; padding:24px;}
+    h1.title{
       font-family:'Hina Mincho', serif;
-      font-size:clamp(32px, 6vw, 64px);
-      line-height:1.3; text-align:center; margin:24px;
+      color:var(--ink);
+      font-size: clamp(32px, 6vw, 60px);
+      line-height:1.25;
+      margin: 24px 0 6px;
     }
-    h1 .highlight{ color:var(--accent); }
+    .title .highlight{ color:var(--accent); }
+    .subtitle{
+      margin:0; font-weight:600;
+      font-size: clamp(16px, 2.4vw, 20px);
+    }
+    .date-pill{
+      display:inline-flex; align-items:center; gap:10px;
+      padding:10px 16px; background:var(--card);
+      border-radius:999px; box-shadow:var(--shadow);
+      color:var(--ink); font-weight:700; margin-top:18px;
+    }
+    .date-pill .firstday{ color:var(--accent); margin-left:6px; }
+    .eligibility{ margin-top:12px; font-weight:700; color:var(--ink); font-size:14px; }
+    .intro-card{
+      margin-top:16px; background:var(--card);
+      border-radius:var(--radius); box-shadow:var(--shadow);
+      padding:16px 18px; border:1px solid rgba(0,0,0,.06);
+      white-space:pre-line;
+    }
+    .intro{ margin:0; font-size:15.5px; line-height:1.9; }
+    .card{
+      background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow);
+      padding:16px 18px; margin:18px 0; border:1px solid rgba(0,0,0,.06);
+    }
+    .card h2{ color:var(--ink); font-size:18px; margin:0 0 8px; }
+    .card p{ margin:0; font-size:14.5px; line-height:1.8; }
+    .coming{
+      margin-top:8px; font-weight:700; color:var(--ink);
+    }
+    footer{ margin-top:40px; padding:20px; font-size:13px; color:#64748b; text-align:center; }
   </style>
 </head>
+
 <body>
-  <h1>糸島<br><span class="highlight">夏休み明け</span><br>プロジェクト2026</h1>
+  <div class="container">
+    <h1 class="title">糸島<br><span class="highlight">夏休み明け</span><br>プロジェクト2026</h1>
+    <p class="subtitle">糸島の子どもの居場所 たくさんあります！</p>
+
+    <div class="date-pill"><span>実施日：</span><time datetime="2026-08-27">8月27日（木）</time><span class="firstday">夏休み明け初日！</span></div>
+    <div class="eligibility">小学生・中学生・高校生｜だれでも利用できます（予約不要・無料）</div>
+
+    <div class="intro-card"><p class="intro">夏休みが終わって「ゆううつだな」と思うのはあたりまえ。無理に学校に行かなくてもだいじょうぶ。明日からのことは明日考えたらいいんです。とりあえず，今日の居場所は用意しました！
+
+ここに来るには予約もなにもいりません。来たいなと思ったら来てみてください。ちょっとのぞくだけでもぜひ。</p></div>
+
+    <section class="card">
+      <h2>参加スポット</h2>
+      <p class="coming">参加する居場所の一覧は、近日このページで公開します。おたのしみに！</p>
+    </section>
+
+    <section class="card"><h2>参加方法</h2><p>予約不要・無料。直接来ていただいて大丈夫です。困ったらお問い合わせください。</p></section>
+    <section class="card"><h2>対象</h2><p>小学生・中学生・高校生と保護者</p></section>
+    <section class="card" id="contact"><h2>お問い合わせ</h2><p>九州大学 佐々木研究室／糸島子どもの居場所プロジェクト<br><a href="mailto:minamo.itoshima@gmail.com">メールで聞く</a></p></section>
+  </div>
+
+  <footer>© 2026 糸島子どもの居場所プロジェクト / 九州大学佐々木研究室</footer>
 </body>
 </html>
