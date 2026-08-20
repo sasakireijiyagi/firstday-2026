@@ -14,6 +14,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Hina+Mincho&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <style>
     :root{
@@ -68,6 +70,43 @@
     .coming{
       margin-top:8px; font-weight:700; color:var(--ink);
     }
+    #overview-map{
+      height: 420px;
+      border-radius: calc(var(--radius) - 4px);
+      border: 1px solid rgba(0,0,0,.08);
+      margin: 12px 0 8px;
+      z-index: 0;
+    }
+    @media(max-width:640px){ #overview-map{ height: 330px; } }
+    .map-note{ font-size:12.5px; margin:0; }
+    .leaflet-popup-content{ font-family:'Noto Sans JP', sans-serif; font-size:13px; line-height:1.6; }
+    .leaflet-popup-content b{ color: var(--ink); }
+    .spot-label{
+      font-family:'Noto Sans JP', sans-serif;
+      font-size:11.5px; font-weight:700; color:var(--ink);
+      background:rgba(255,255,255,.88);
+      border:1px solid rgba(0,0,0,.12); border-radius:6px;
+      padding:2px 6px; box-shadow:none;
+    }
+    .spot-label::before{ display:none; }
+    .map-legend{
+      font-family:'Noto Sans JP', sans-serif;
+      background:rgba(255,255,255,.92); border-radius:8px;
+      padding:6px 10px; font-size:12px; font-weight:700; color:var(--ink);
+      border:1px solid rgba(0,0,0,.12);
+    }
+    .map-legend span{ display:inline-flex; align-items:center; margin-right:10px; }
+    .map-legend i{
+      display:inline-block; width:11px; height:11px; border-radius:50%;
+      border:2px solid #fff; box-shadow:0 0 0 1px rgba(0,0,0,.15);
+      margin-right:5px;
+    }
+    .day-badge{
+      display:inline-block; font-size:11.5px; font-weight:700; color:#fff;
+      border-radius:6px; padding:1px 7px; vertical-align:1px;
+    }
+    .day-badge.day27{ background:#5C8EDC; }
+    .day-badge.day28{ background:#E8963D; }
     .past{ margin:28px 0 0; text-align:center; font-size:13px; }
     .past a{ color:#64748b; }
     footer{ margin-top:40px; padding:20px; font-size:13px; color:#64748b; text-align:center; }
@@ -84,7 +123,9 @@
 
     <section class="card">
       <h2>参加スポット</h2>
-      <p class="coming">参加する居場所の一覧は、近日このページで公開します。</p>
+      <p class="coming">8月27日（木）は市内8か所、28日（金）は1か所で開きます。</p>
+      <div id="overview-map"></div>
+      <p class="map-note">ピンをタップすると、場所の名前と時間が出ます。それぞれのくわしい紹介は、準備ができしだいこのページに載せます。</p>
     </section>
 
     <section class="card"><h2>参加方法</h2><p>予約不要・無料。直接来ていただいて大丈夫です。困ったらお問い合わせください。</p></section>
@@ -95,5 +136,74 @@
   </div>
 
   <footer>© 2026 糸島子どもの居場所プロジェクト / 九州大学佐々木研究室</footer>
+
+  <script id="spots-data" type="application/json">[
+    {"name":"みんなの居場所","area":"篠原東","day":"8/27（木）","time":"10:00–18:00","lat":33.553322,"lng":130.207367},
+    {"name":"ゆめふうせん","area":"有田中央","day":"8/27（木）","time":"9:00–15:00","lat":33.545219,"lng":130.215149},
+    {"name":"わんぱく塾（やぎのいる居場所）","shortName":"わんぱく塾","area":"二丈福井","day":"8/27（木）","time":"9:00–13:00","lat":33.4909663,"lng":130.1026779},
+    {"name":"MUKA（社会福祉法人香月会）","shortName":"MUKA","area":"志摩久家","day":"8/27（木）","time":"10:00–12:00","lat":33.564266,"lng":130.138199},
+    {"name":"学びのスペースてらこやん","shortName":"てらこやん","area":"長糸","day":"8/27（木）","time":"10:00–15:00","lat":33.510864,"lng":130.19458},
+    {"name":"みんなの","area":"前原中央","day":"8/27（木）","time":"9:00–15:00","lat":33.560982,"lng":130.197876},
+    {"name":"umu","area":"香力","day":"8/27（木）","time":"9:00–15:00","lat":33.534668,"lng":130.217133},
+    {"name":"Life is...","area":"志摩船越","day":"8/27（木）","time":"9:00–14:00","lat":33.558064,"lng":130.126587},
+    {"name":"うみのね","area":"二丈深江","day":"8/28（金）","time":"時間調整中","lat":33.513111,"lng":130.130798}
+  ]</script>
+
+  <script>
+    function drawOverviewMap(){
+      if (typeof L === 'undefined') return;
+      const spots = JSON.parse(document.getElementById('spots-data').textContent);
+      const DAY_COLORS = { day27: '#5C8EDC', day28: '#E8963D' };
+      const map = L.map('overview-map', {scrollWheelZoom:false});
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+
+      const bounds = [];
+      spots.forEach(s=>{
+        const is28 = s.day.startsWith('8/28');
+        const m = L.circleMarker([s.lat, s.lng], {
+          radius: 9, color: '#fff', weight: 2,
+          fillColor: is28 ? DAY_COLORS.day28 : DAY_COLORS.day27, fillOpacity: 1
+        }).addTo(map);
+        m.bindTooltip(s.shortName || s.name, {permanent:true, direction:'right', offset:[10,0], className:'spot-label'});
+        m.bindPopup(`<b>${s.name}</b>【${s.area}】<br><span class="day-badge ${is28?'day28':'day27'}">${s.day}</span> ${s.time}`);
+        bounds.push([s.lat, s.lng]);
+      });
+      map.fitBounds(bounds, {padding:[36,36]});
+
+      const legend = L.control({position:'bottomleft'});
+      legend.onAdd = function(){
+        const div = L.DomUtil.create('div', 'map-legend');
+        div.innerHTML = `<span><i style="background:${DAY_COLORS.day27}"></i>8/27（木）</span>
+          <span><i style="background:${DAY_COLORS.day28}"></i>8/28（金）</span>`;
+        return div;
+      };
+      legend.addTo(map);
+
+      // レイアウト確定後にもう一度収める（初回描画で拡大しすぎるのを防ぐ）
+      // 幅が確定していないうちに fitBounds すると拡大しすぎるので、
+      // サイズが変わるたびに収め直す（フォント読み込み・画面回転・タブ復帰にも対応）
+      const refit = () => {
+        const el = document.getElementById('overview-map');
+        if (!el.clientWidth) return;
+        map.invalidateSize();
+        map.fitBounds(bounds, {padding:[36,36]});
+      };
+      refit();
+      window.addEventListener('load', refit);
+      if (window.ResizeObserver) {
+        new ResizeObserver(refit).observe(document.getElementById('overview-map'));
+      } else {
+        window.addEventListener('resize', refit);
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', drawOverviewMap);
+    } else {
+      drawOverviewMap();
+    }
+  </script>
 </body>
 </html>
