@@ -124,6 +124,11 @@
     .place .time{ margin-top:6px; font-weight:700; color:var(--ink); font-size:14px; }
     .place .meta{ margin-top:6px; font-size:12.5px; line-height:1.6; }
     .place .address{ margin-top:6px; font-size:12.5px; line-height:1.6; }
+    .place .map{
+      margin-top:10px; border-radius: calc(var(--radius) - 4px); overflow:hidden;
+      border:1px solid rgba(0,0,0,.08);
+    }
+    .place .map iframe{ display:block; width:100%; height:200px; border:0; }
     .place .links{ margin-top:8px; font-size:12.5px; }
     .place .links a{ color:var(--accent); font-weight:700; text-decoration:none; margin-right:12px; }
     .place .links a:hover{ text-decoration:underline; }
@@ -202,6 +207,7 @@
         el.innerHTML = `<h3><a href="${s.link}" target="_blank" rel="noopener">${s.name}</a><span class="area">【${s.area}】</span></h3>
           <div class="time"><span class="day-badge ${is28?'day28':'day27'}">${s.day}</span> ${s.time}</div>
           <div class="meta">${s.meta || ''}</div>
+          ${s.mapQuery ? `<div class="map"><iframe src="https://maps.google.com/maps?q=${encodeURIComponent(s.mapQuery)}&z=15&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="${s.name}の地図"></iframe></div>` : ''}
           <div class="address">${s.address || ''}</div>
           <div class="links"><a href="${gmap}" target="_blank" rel="noopener">地図を開く</a><a href="${s.link}" target="_blank" rel="noopener">サイト</a></div>`;
         list.appendChild(el);
