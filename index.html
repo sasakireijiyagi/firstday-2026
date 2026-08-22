@@ -112,6 +112,22 @@
     }
     .day-badge.day27{ background:#5C8EDC; }
     .day-badge.day28{ background:#E8963D; }
+    html{ scroll-behavior:smooth; }
+    .grid{ display:grid; gap:14px; }
+    .grid.cols-2{ grid-template-columns: repeat(2, 1fr); }
+    @media(max-width:640px){ .grid.cols-2{ grid-template-columns:1fr; } }
+    .place{ margin:0; padding:14px 16px; }
+    .place h3{ margin:0 0 4px; font-size:16.5px; color:var(--ink); }
+    .place h3 a{ color:inherit; text-decoration:none; }
+    .place h3 a:hover{ text-decoration:underline; }
+    .place h3 .area{ font-size:12.5px; font-weight:500; color:var(--muted); margin-left:6px; }
+    .place .time{ margin-top:6px; font-weight:700; color:var(--ink); font-size:14px; }
+    .place .meta{ margin-top:6px; font-size:12.5px; line-height:1.6; }
+    .place .address{ margin-top:6px; font-size:12.5px; line-height:1.6; }
+    .place .links{ margin-top:8px; font-size:12.5px; }
+    .place .links a{ color:var(--accent); font-weight:700; text-decoration:none; margin-right:12px; }
+    .place .links a:hover{ text-decoration:underline; }
+    .place:target{ outline:3px solid var(--accent); outline-offset:2px; }
     .past{ margin:28px 0 0; text-align:center; font-size:13px; }
     .past a{ color:#64748b; }
     footer{ margin-top:40px; padding:20px; font-size:13px; color:#64748b; text-align:center; }
@@ -136,7 +152,12 @@
       <h2>参加スポット</h2>
       <p class="coming">8月27日（木）は市内8か所、28日（金）は1か所で開きます。</p>
       <div id="overview-map"></div>
-      <p class="map-note">ピンをタップすると、場所の名前と時間が出ます。それぞれのくわしい紹介は、準備ができしだいこのページに載せます。</p>
+      <p class="map-note">ピンをタップすると名前と時間が出て、「くわしく」から下の一覧に移動できます。各スポットの紹介文・写真は、準備ができしだい載せます。</p>
+    </section>
+
+    <section>
+      <h2 style="color:var(--ink);font-size:18px;margin:24px 0 10px;">スポット一覧</h2>
+      <div id="spots-list" class="grid cols-2"></div>
     </section>
 
     <section class="card"><h2>参加方法</h2><p>予約不要・無料。直接来ていただいて大丈夫です。困ったらお問い合わせください。</p></section>
@@ -149,15 +170,15 @@
   <footer>© 2026 糸島子どもの居場所プロジェクト / 九州大学佐々木研究室</footer>
 
   <script id="spots-data" type="application/json">[
-    {"name":"みんなの居場所","area":"篠原東","day":"8/27（木）","time":"10:00–18:00","lat":33.553322,"lng":130.207367},
-    {"name":"ゆめふうせん","area":"有田中央","day":"8/27（木）","time":"9:00–15:00","lat":33.545219,"lng":130.215149},
-    {"name":"わんぱく塾（やぎのいる居場所）","shortName":"わんぱく塾","area":"二丈福井","day":"8/27（木）","time":"9:00–13:00","lat":33.4909663,"lng":130.1026779},
-    {"name":"MUKA（社会福祉法人香月会）","shortName":"MUKA","area":"志摩久家","day":"8/27（木）","time":"10:00–12:00","lat":33.564266,"lng":130.138199},
-    {"name":"学びのスペースてらこやん","shortName":"てらこやん","area":"長糸","day":"8/27（木）","time":"10:00–15:00","lat":33.510864,"lng":130.19458},
-    {"name":"みんなの","area":"前原中央","day":"8/27（木）","time":"9:00–15:00","lat":33.560982,"lng":130.197876},
-    {"name":"umu","area":"香力","day":"8/27（木）","time":"9:00–15:00","lat":33.534668,"lng":130.217133},
-    {"name":"Life is...","area":"志摩船越","day":"8/27（木）","time":"9:00–14:00","lat":33.558064,"lng":130.126587},
-    {"name":"うみのね","area":"二丈深江","day":"8/28（金）","time":"時間調整中","lat":33.513111,"lng":130.130798}
+    {"name": "みんなの居場所", "area": "篠原東", "day": "8/27（木）", "time": "10:00–18:00", "lat": 33.553322, "lng": 130.207367, "meta": "筑前前原駅から徒歩15分", "address": "福岡県糸島市篠原東1丁目23-32", "link": "https://itoshima-jidoclub.com/", "mapQuery": "福岡県糸島市篠原東1丁目23-32"},
+    {"name": "ゆめふうせん", "area": "有田中央", "day": "8/27（木）", "time": "9:00–15:00", "lat": 33.545219, "lng": 130.215149, "meta": "筑前前原駅から車で7分", "address": "福岡県糸島市有田中央1-10-6", "link": "https://yumefuusen.org/", "mapQuery": "福岡県糸島市有田中央1-10-6"},
+    {"name": "わんぱく塾（やぎのいる居場所）", "shortName": "わんぱく塾", "area": "二丈福井", "day": "8/27（木）", "time": "9:00–13:00（13時までに入場すれば延長もあり）", "lat": 33.4909663, "lng": 130.1026779, "meta": "「加茂ゆらりんこ橋」駐車場から徒歩3分", "address": "福岡県糸島市二丈福井4208-1", "link": "https://maps.app.goo.gl/fZufGMH5pnsZ8Etr7", "mapQuery": "わんぱく塾 糸島市二丈福井"},
+    {"name": "MUKA（社会福祉法人香月会）", "area": "志摩久家", "day": "8/27（木）", "time": "10:00–12:00", "lat": 33.564266, "lng": 130.138199, "meta": "筑前前原駅から車で14分", "address": "〒819-1331 福岡県糸島市志摩久家2482-2", "link": "https://muka.or.jp/", "mapQuery": "福岡県糸島市志摩久家2482-2"},
+    {"name": "学びのスペースてらこやん", "shortName": "てらこやん", "area": "長糸", "day": "8/27（木）", "time": "10:00–15:00", "lat": 33.510864, "lng": 130.19458, "meta": "長糸コミュニティセンターで開催（改装中で養生シートがかかっていますが通常どおり開館しています）", "address": "〒819-1155 福岡県糸島市川付876-1（長糸コミュニティセンター）", "link": "https://www.city.itoshima.lg.jp/c007/", "mapQuery": "長糸コミュニティセンター 糸島市"},
+    {"name": "みんなの", "area": "前原中央", "day": "8/27（木）", "time": "9:00–15:00", "lat": 33.560982, "lng": 130.197876, "meta": "筑前前原駅から歩いて7分", "address": "〒819-1116 福岡県糸島市前原中央3丁目4-3", "link": "https://minnano-itoshima.com/", "mapQuery": "福岡県糸島市前原中央3丁目4-3"},
+    {"name": "umu", "area": "香力", "day": "8/27（木）", "time": "9:00–15:00", "lat": 33.534668, "lng": 130.217133, "meta": "Instagram: @umu.itoshima", "address": "〒819-1147 福岡県糸島市香力227", "link": "https://umu-itoshima.jp/", "mapQuery": "福岡県糸島市香力227"},
+    {"name": "Life is...", "area": "志摩船越", "day": "8/27（木）", "time": "9:00–14:00", "lat": 33.558064, "lng": 130.126587, "meta": "駐車場は船越漁港をご利用ください", "address": "福岡県糸島市志摩船越83-1（駐車場：船越漁港）", "link": "https://www.lifeisitoshima.com/", "mapQuery": "福岡県糸島市志摩船越83-1"},
+    {"name": "うみのね", "area": "二丈深江", "day": "8/28（金）", "time": "時間調整中", "lat": 33.513111, "lng": 130.130798, "meta": "筑前深江駅から徒歩15分｜こちらは28日（金）に開きます", "address": "福岡県糸島市二丈深江2138（うみかえる）", "link": "https://www.minamoitoshima.com/", "mapQuery": "福岡県糸島市二丈深江2138"}
   ]</script>
 
   <script>
@@ -170,15 +191,31 @@
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(map);
 
+      // スポット一覧（写真・紹介文なしのインデックス）
+      const list = document.getElementById('spots-list');
+      spots.forEach((s, i)=>{
+        const is28 = s.day.startsWith('8/28');
+        const el = document.createElement('article');
+        el.className = 'place card';
+        el.id = `spot-${i}`;
+        const gmap = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.mapQuery || s.address)}`;
+        el.innerHTML = `<h3><a href="${s.link}" target="_blank" rel="noopener">${s.name}</a><span class="area">【${s.area}】</span></h3>
+          <div class="time"><span class="day-badge ${is28?'day28':'day27'}">${s.day}</span> ${s.time}</div>
+          <div class="meta">${s.meta || ''}</div>
+          <div class="address">${s.address || ''}</div>
+          <div class="links"><a href="${gmap}" target="_blank" rel="noopener">地図を開く</a><a href="${s.link}" target="_blank" rel="noopener">サイト</a></div>`;
+        list.appendChild(el);
+      });
+
       const bounds = [];
-      spots.forEach(s=>{
+      spots.forEach((s, i)=>{
         const is28 = s.day.startsWith('8/28');
         const m = L.circleMarker([s.lat, s.lng], {
           radius: 9, color: '#fff', weight: 2,
           fillColor: is28 ? DAY_COLORS.day28 : DAY_COLORS.day27, fillOpacity: 1
         }).addTo(map);
         m.bindTooltip(s.shortName || s.name, {permanent:true, direction:'right', offset:[10,0], className:'spot-label'});
-        m.bindPopup(`<b>${s.name}</b>【${s.area}】<br><span class="day-badge ${is28?'day28':'day27'}">${s.day}</span> ${s.time}`);
+        m.bindPopup(`<b>${s.name}</b>【${s.area}】<br><span class="day-badge ${is28?'day28':'day27'}">${s.day}</span> ${s.time}<br><a href="#spot-${i}">くわしく（一覧へ）</a>`);
         bounds.push([s.lat, s.lng]);
       });
       map.fitBounds(bounds, {padding:[36,36]});
