@@ -1,7 +1,8 @@
 # confirm-src.html（平文の元データ）→ index.html（公開ページ）へスポット情報を同期する。
 # 写真は img/ に書き出してファイル参照にする（公開ページは遅延読み込みできるようにするため）。
 # 使い方: python3 sync_public.py
-import re, json, base64, os, pathlib
+import re, json, base64, os, pathlib, io
+from PIL import Image
 
 ROOT = pathlib.Path(__file__).parent
 IMG = ROOT / "img"
@@ -19,8 +20,12 @@ for i, sp in enumerate(cfg["spots"]):
     if photo.startswith("data:image/"):
         ext = "jpg" if "jpeg" in photo.split(",", 1)[0] else "png"
         fname = f"spot-{i}.{ext}"
-        (IMG / fname).write_bytes(base64.b64decode(photo.split(",", 1)[1]))
+        raw = base64.b64decode(photo.split(",", 1)[1])
+        (IMG / fname).write_bytes(raw)
         rec["photo"] = f"img/{fname}"
+        # 画像の実寸を持たせると、読み込み前でもブラウザが高さを確保できる
+        with Image.open(io.BytesIO(raw)) as _im:
+            rec["photoW"], rec["photoH"] = _im.size
         kept.add(fname)
     pub.append(rec)
 
