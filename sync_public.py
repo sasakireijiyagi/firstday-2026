@@ -10,8 +10,8 @@ IMG.mkdir(exist_ok=True)
 src = (ROOT / "confirm-src.html").read_text(encoding="utf-8")
 cfg = json.loads(re.search(r'<script id="site-config" type="application/json">(.*?)</script>', src, re.S).group(1))
 
-# 公開ページに出してよいのは写真まで。紹介文(desc)は確認用ページ限定のため同期しない
-KEYS = ["name", "shortName", "area", "day", "time", "lat", "lng", "meta", "address", "link", "mapQuery"]
+# 2026-08-24: 紹介文(desc)も公開ページに掲載する方針に変更（各団体の連絡先を含む）
+KEYS = ["name", "shortName", "area", "day", "time", "lat", "lng", "meta", "address", "link", "mapQuery", "desc"]
 pub, kept = [], set()
 for i, sp in enumerate(cfg["spots"]):
     rec = {k: sp[k] for k in KEYS if sp.get(k) not in (None, "")}
