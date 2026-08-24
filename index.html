@@ -136,11 +136,12 @@
     /* 奇数個で最後の1枚が余るときは横いっぱいに */
     .place.wide{ grid-column: 1 / -1; }
     @media(min-width:641px){
-      .place.wide{ display:grid; grid-template-columns: 1fr 1fr; gap:0 18px; align-items:start; }
+      .place.wide{ display:grid; grid-template-columns: 1fr 1fr; gap:0 18px;
+        align-items:start; align-content:start; grid-auto-rows:min-content; }
       .place.wide > h3, .place.wide > .time, .place.wide > .meta,
       .place.wide > .desc, .place.wide > .address, .place.wide > .links{ grid-column:1; }
       .place.wide > .photo{ grid-column:2; grid-row:1 / span 20; margin-top:0; }
-      .place.wide > .map{ grid-column:2; margin-top:12px; }
+      .place.wide > .map{ grid-column:1; order:1; margin-top:12px; }  /* 左下の余白を地図で埋める */
     }
     .place:target{ outline:3px solid var(--accent); outline-offset:2px; }
     .past{ margin:28px 0 0; text-align:center; font-size:13px; }
