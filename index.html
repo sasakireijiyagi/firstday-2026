@@ -117,7 +117,7 @@
     .grid{ display:grid; gap:14px; }
     .grid.cols-2{ grid-template-columns: repeat(2, 1fr); }
     @media(max-width:640px){ .grid.cols-2{ grid-template-columns:1fr; } }
-    .place{ margin:0; padding:14px 16px; }
+    .place{ margin:0; padding:14px 16px; height:100%; box-sizing:border-box; }
     .place h3{ margin:0 0 4px; font-size:16.5px; color:var(--ink); }
     .place h3 a{ color:inherit; text-decoration:none; }
     .place h3 a:hover{ text-decoration:underline; }
@@ -127,12 +127,23 @@
     .place .address{ margin-top:6px; font-size:12.5px; line-height:1.6; }
     .place .desc{ margin-top:8px; font-size:13.5px; line-height:1.7; }
     .place .photo{ margin-top:10px; }
-    .place .photo img{ width:100%; height:auto; display:block; border-radius:calc(var(--radius) - 6px); }
+    /* 写真の縦横比をそろえてカードの高さを均一に（はみ出しは中央基準でトリミング） */
+    .place .photo img{ width:100%; aspect-ratio:4/3; object-fit:cover; display:block; border-radius:calc(var(--radius) - 6px); }
     .place .map{ margin-top:10px; border-radius:calc(var(--radius) - 6px); overflow:hidden; border:1px solid rgba(0,0,0,.08); }
     .place .map iframe{ display:block; width:100%; height:200px; border:0; }
     .place .links{ margin-top:8px; font-size:12.5px; }
     .place .links a{ color:var(--accent); font-weight:700; text-decoration:none; margin-right:12px; }
     .place .links a:hover{ text-decoration:underline; }
+    /* 奇数個で最後の1枚が余るときは横いっぱいに */
+    .place.wide{ grid-column: 1 / -1; }
+    @media(min-width:641px){
+      .place.wide{ display:grid; grid-template-columns: 1fr 1fr; gap:0 18px; align-items:start; }
+      .place.wide > h3, .place.wide > .time, .place.wide > .meta,
+      .place.wide > .desc, .place.wide > .address, .place.wide > .links{ grid-column:1; }
+      .place.wide > .photo{ grid-column:2; grid-row:1 / span 20; margin-top:0; }
+      .place.wide > .map{ grid-column:2; margin-top:12px; }
+      .place.wide .photo img{ aspect-ratio:16/10; }
+    }
     .place:target{ outline:3px solid var(--accent); outline-offset:2px; }
     .past{ margin:28px 0 0; text-align:center; font-size:13px; }
     .past a{ color:#64748b; }
@@ -208,7 +219,7 @@
       const list = document.getElementById('spots-list');
       spots.forEach((s, i)=>{
         const el = document.createElement('article');
-        el.className = 'place card';
+        el.className = 'place card' + (spots.length % 2 === 1 && i === spots.length - 1 ? ' wide' : '');
         el.id = `spot-${i}`;
         const gmap = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.mapQuery || s.address)}`;
         el.innerHTML = `<h3><a href="${s.link}" target="_blank" rel="noopener">${s.name}</a><span class="area">【${s.area}】</span></h3>
