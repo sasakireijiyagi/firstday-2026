@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /confirm/
+
+Sitemap: https://firstday2026.sasakireijiyagi.com/sitemap.xml
