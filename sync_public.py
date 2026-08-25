@@ -1,7 +1,7 @@
 # confirm-src.html（平文の元データ）→ index.html（公開ページ）へスポット情報を同期する。
 # 写真は img/ に書き出してファイル参照にする（公開ページは遅延読み込みできるようにするため）。
 # 使い方: python3 sync_public.py
-import re, json, base64, os, pathlib, io
+import re, json, base64, os, pathlib, io, urllib.parse
 from PIL import Image
 
 ROOT = pathlib.Path(__file__).parent
@@ -88,6 +88,47 @@ for sp in pub:
         if sp.get("photo"):
             ev["image"] = SITE + sp["photo"]
         events.append(ev)
+
+# --- スポット一覧を静的HTMLとしても書き出す（JavaScript無しでも読めるように） ---
+def day_class(day):
+    d = day or ""
+    a, b = "8/27" in d, "8/28" in d
+    return "both" if (a and b) else ("day28" if b else "day27")
+
+def esc(t):
+    return (t or "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+cards = []
+for i, sp in enumerate(pub):
+    wide = " wide" if len(pub) % 2 == 1 and i == len(pub) - 1 else ""
+    gmap = "https://www.google.com/maps/search/?api=1&query=" + urllib.parse.quote(sp.get("mapQuery") or sp.get("address", ""))
+    title = (f'<a href="{sp["link"]}" target="_blank" rel="noopener">{esc(sp["name"])}</a>'
+             if sp.get("link") else esc(sp["name"]))
+    parts = [f'<article class="place card{wide}" id="spot-{i}">',
+             f'<h3>{title}<span class="area">【{esc(sp.get("area",""))}】</span></h3>',
+             f'<div class="time"><span class="day-badge {day_class(sp.get("day"))}">{esc(sp.get("day",""))}</span> {esc(sp.get("time",""))}</div>',
+             f'<div class="meta">{sp.get("meta","")}</div>']
+    if sp.get("desc"):
+        parts.append(f'<p class="desc">{sp["desc"]}</p>')   # descにはtelリンクを含むためエスケープしない
+    if sp.get("photo"):
+        parts.append(f'<div class="photo"><img src="{sp["photo"]}" alt="{esc(sp["name"])}のようす" '
+                     f'width="{sp.get("photoW","")}" height="{sp.get("photoH","")}" loading="lazy" decoding="async"></div>')
+    if sp.get("mapQuery"):
+        parts.append(f'<div class="map"><iframe src="https://maps.google.com/maps?q='
+                     f'{urllib.parse.quote(sp["mapQuery"])}&amp;z=15&amp;output=embed" loading="lazy" '
+                     f'referrerpolicy="no-referrer-when-downgrade" title="{esc(sp["name"])}の地図"></iframe></div>')
+    parts.append(f'<div class="address">{esc(sp.get("address",""))}</div>')
+    links = f'<a href="{gmap}" target="_blank" rel="noopener">地図を開く</a>'
+    if sp.get("link"):
+        links += f'<a href="{sp["link"]}" target="_blank" rel="noopener">サイト</a>'
+    parts.append(f'<div class="links">{links}</div>')
+    parts.append('</article>')
+    cards.append("\n      ".join(parts))
+
+list_html = '<div id="spots-list" class="grid cols-2">\n      ' + "\n      ".join(cards) + '\n    </div>'
+idx, n3 = re.subn(r'<div id="spots-list" class="grid cols-2">.*?</div>\s*(?=\n\s*</section>)',
+                  lambda m: list_html, idx, flags=re.S)
+assert n3 == 1, "spots-list block not found"
 
 jsonld = json.dumps({"@context": "https://schema.org", "@graph": events}, ensure_ascii=False, indent=2)
 idx, n2 = re.subn(r'(<script id="jsonld" type="application/ld\+json">).*?(</script>)',
